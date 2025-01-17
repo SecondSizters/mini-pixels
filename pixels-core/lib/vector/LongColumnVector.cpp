@@ -1,5 +1,5 @@
 //
-// Created by liyu on 3/17/23.
+// Created by liyu on 3/17/23. ensureSize --sizter 1.17.25
 //
 
 #include "vector/LongColumnVector.h"
@@ -119,7 +119,7 @@ void LongColumnVector::ensureSize(uint64_t size, bool preserveData) {
             memoryUsage += (long) sizeof(long) * (size - length);
             resize(size);
         } else {
-            long *oldVector = intVector;
+            int *oldVector = intVector;
             posix_memalign(reinterpret_cast<void **>(&intVector), 32,
                            size * sizeof(int32_t));
             if (preserveData) {
