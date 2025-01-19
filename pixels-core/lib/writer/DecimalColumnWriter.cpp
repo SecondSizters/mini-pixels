@@ -17,3 +17,53 @@
  * License along with Pixels.  If not, see
  * <https://www.gnu.org/licenses/>.
  */
+
+#include "writer/DecimalColumnWriter.h"
+#include "utils/BitUtils.h"
+
+DecimalColumnWriter::DecimalColumnWriter(std::shared_ptr<TypeDescription> type,std::shared_ptr<PixelsWriterOption> writerOption) :
+ColumnWriter(type, writerOption), curPixelVector(pixelStride)
+{}
+
+int DecimalColumnWriter::write(std::shared_ptr<ColumnVector> vector, int size)
+{
+    std::cout << "In DecimalColumnWriter" << std::endl;
+    auto columnVector = std::static_pointer_cast<DecimalColumnVector>(vector);
+    long *values = columnVector->vector;
+    EncodingUtils encodingUtils;
+
+    for (int i = 0; i < size; i ++) {
+        curPixelEleIndex++;
+        if (columnVector->isNull[i])
+        {
+            hasNull = true;
+            if (nullsPadding)
+            {
+                // padding 0 for nulls
+                encodingUtils.writeLongLE(outputStream, 0L);
+            }
+        }
+        else
+        {
+            if (byteOrder == ByteOrder::PIXELS_LITTLE_ENDIAN)
+            {
+                encodingUtils.writeLongLE(outputStream, values[i]);
+            }
+            else
+            {
+                encodingUtils.writeLongBE(outputStream, values[i]);
+            }
+            if (curPixelEleIndex >= pixelStride)
+            {
+                ColumnWriter::newPixel();
+            }
+        }
+    }
+
+    return outputStream->getWritePos();
+}
+
+bool DecimalColumnWriter::decideNullsPadding(std::shared_ptr<PixelsWriterOption> writerOption)
+{
+    return writerOption->isNullsPadding();
+}
