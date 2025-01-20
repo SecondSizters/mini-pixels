@@ -53,6 +53,7 @@ void DateColumnVector::set(int elementNum, int days) {
 	}
 	dates[elementNum] = days;
 	// TODO: isNull
+    isNull[elementNum] = false;
 }
 
 void * DateColumnVector::current() {
@@ -98,9 +99,16 @@ void DateColumnVector::add(int value) {
   	if (writeIndex >= length) {
         ensureSize(writeIndex * 2, true);
     }
-    int index = writeIndex++;
-    dates[index] = value;
-    isNull[index] = false;
+
+    set(writeIndex ++, value);
+}
+
+void DateColumnVector::add(int64_t value) {
+	if (writeIndex >= length) {
+		ensureSize(writeIndex * 2, true);
+	}
+
+	set(writeIndex ++, value);
 }
 
 void DateColumnVector::ensureSize(uint64_t size, bool preserveData) {

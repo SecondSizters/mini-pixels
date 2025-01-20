@@ -69,6 +69,7 @@ void TimestampColumnVector::set(int elementNum, long ts) {
     }
     times[elementNum] = ts;
     // TODO: isNull
+    isNull[elementNum] = false;
 }
 
 void TimestampColumnVector::add(bool value) {
@@ -79,18 +80,16 @@ void TimestampColumnVector::add(int value) {
     if (writeIndex >= length) {
         ensureSize(writeIndex * 2, true);
     }
-    int index = writeIndex++;
-    times[index] = value;
-    isNull[index] = false;
+
+    set(writeIndex ++, value);
 }
 
 void TimestampColumnVector::add(int64_t value) {
     if (writeIndex >= length) {
         ensureSize(writeIndex * 2, true);
     }
-    int index = writeIndex++;
-    times[index] = value;
-    isNull[index] = false;
+
+    set(writeIndex ++, value);
 }
 
 void TimestampColumnVector::add(std::string &value) {
@@ -120,7 +119,7 @@ void TimestampColumnVector::add(std::string &value) {
         boost::posix_time::time_duration diff = pt - epoch;
 
         // 将时间差转换为微秒
-        uint64_t microseconds = diff.total_microseconds();
+        long microseconds = diff.total_microseconds();
 
         add(microseconds);
     }

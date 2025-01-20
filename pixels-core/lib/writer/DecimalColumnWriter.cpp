@@ -22,7 +22,7 @@
 #include "utils/BitUtils.h"
 
 DecimalColumnWriter::DecimalColumnWriter(std::shared_ptr<TypeDescription> type,std::shared_ptr<PixelsWriterOption> writerOption) :
-ColumnWriter(type, writerOption), curPixelVector(pixelStride)
+ColumnWriter(type, writerOption)
 {}
 
 int DecimalColumnWriter::write(std::shared_ptr<ColumnVector> vector, int size)
